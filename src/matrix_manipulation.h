@@ -10,14 +10,14 @@
 
 	NOTES:
 		This unit implements some very basic matrix functions, which include:
- *  + Addition/subtraction
- *  + Transpose
- *  + Determinant
- *  + Dot product
- *  + Matrix product
- *  + Scalar product
- *  + Inversion
- *  + LU factorization/decomposition
+			+ Addition/subtraction
+			+ Transpose
+			+ Determinant
+			+ Dot product
+			+ Matrix product
+			+ Scalar product
+			+ Inversion
+			+ LU factorization/decomposition
 
 	LICENSE:
 		This program is free software: you can redistribute it and/or modify
@@ -301,16 +301,16 @@ class Matrix
 			}
 		}
 
-		/**
-			Return part of the matrix.
-			NOTE: The end points are the last elements copied.  They can
-			be equal to the first element when wanting just a single row
-			or column.  However, the span of the total matrix is
-(0, rows - 1, 0, columns - 1).
+		/**	Return part of the matrix.
+				NOTE: The end points are the last elements copied.  They can
+				be equal to the first element when wanting just a single row
+				or column.  However, the span of the total matrix is
+				(0, rows - 1, 0, columns - 1).
 		*/
-		Matrix getSubMatrix(unsigned int startRow, unsigned int endRow,
-												unsigned int startColumn, unsigned int endColumn,
-												unsigned int const* newOrder = nullptr)
+		Matrix getSubMatrix(
+				unsigned int startRow, unsigned int endRow,
+				unsigned int startColumn, unsigned int endColumn,
+				unsigned int const* newOrder = nullptr)
 		{
 			Matrix subMatrix(endRow - startRow + 1, endColumn - startColumn + 1);
 
@@ -384,7 +384,7 @@ class Matrix
 			}
 		} // reducedRowEcholon
 
-		/** Return the determinant of the matrix.
+		/**	Return the determinant of the matrix.
 				Recursive function.
 		*/
 		T determinant() const
@@ -416,8 +416,7 @@ class Matrix
 			}
 			else
 			{
-				result =(matrix[0][0] * matrix[1][1])
-								-(matrix[0][1] * matrix[1][0]);
+				result = (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
 			}
 
 			return result;
@@ -593,7 +592,7 @@ class Matrix
 			return *this;
 		}
 
-		/** Copy matrix data from array.
+		/**	Copy matrix data from array.
 				Although matrix data is two dimensional, this copy function
 				assumes the previous row is immediately followed by the next
 				row's data.

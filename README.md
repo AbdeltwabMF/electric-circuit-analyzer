@@ -2,4 +2,4 @@
 
 A simple circuit analysis program.
 
-## Licensed under the [MIT License](LICENSE)
+## Licensed under the [GPL-v3 License](LICENSE)
