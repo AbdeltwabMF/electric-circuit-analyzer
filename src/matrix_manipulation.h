@@ -209,8 +209,8 @@ class Matrix
 			else
 				rowOffset = copyMatrixA.rows;
 
-			rows    = copyMatrixA.rows    + rowOffset;
-			columns = copyMatrixA.columns + columnOffset;
+			rows    = copyMatrixB.rows    + rowOffset;
+			columns = copyMatrixB.columns + columnOffset;
 
 			// Allocate memory for new matrix.
 			allocate(rows, columns);
@@ -568,9 +568,7 @@ class Matrix
 		Matrix const operator * (Matrix const & otherMatrix) const
 		{
 			T const ZERO = static_cast <T>(0);
-
 			assert(columns == otherMatrix.rows);
-
 			Matrix result(rows, otherMatrix.columns);
 
 			for(int row = 0; row < rows; ++row)
