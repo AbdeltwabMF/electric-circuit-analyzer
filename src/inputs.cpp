@@ -1,6 +1,7 @@
 #include "inputs.h"
 
 #include "colors.h"
+#include "matrix_manipulation.h"
 
 #include <cstddef>
 #include <iterator>
@@ -21,7 +22,7 @@ std::string colorAndRest(std::string _str, std::string _new, std::string _old)
 }
 
 /** The input specifications formatted using the ANSI escape code */
-void _inputInstructions_A()
+void inputInstructions_A()
 {
 	std::cout << Purple << "***************************************************************" << std::endl;
 	std::cout << White  << "            Simple Electric Circuits Analysis             \n" << std::endl;
@@ -67,7 +68,7 @@ std::vector<char> getBranchesOrder(std::vector<char> ATree,
 	return branchesOrder;
 }
 
-void _inputInstructions_B(std::vector<char> ATree,
+void inputInstructions_B(std::vector<char> ATree,
 		std::map <char, std::pair<int, int>> & invBranchName)
 {
 	std::cout << std::endl;
@@ -88,7 +89,10 @@ void _inputInstructions_B(std::vector<char> ATree,
 		std::cout << White << values[vcr];
 		for(char ch : branchesOrder)
 			std::cout << Yellow << " " << ch;
+
+		std::cout << std::endl;
 	}
+	std::cout << Reset << std::endl;
 }
 
 /** Searching for Tree branches */
@@ -97,7 +101,7 @@ void dfs(std::vector<std::vector<int>> const & graph,
 		std::vector<char> & treeBranches,
 		std::map <std::pair<int, int>, char> & branchName,
 		std::unordered_map<char, bool> & sameComponent,
-		int & source, bool _link = true)
+		int & source, bool _link)
 {
 	// Cycle detected
 	if(visited[source] == 1)
