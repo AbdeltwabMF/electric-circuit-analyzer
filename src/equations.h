@@ -3,6 +3,53 @@
 
 #include "inputs.h"
 #include "matrix_manipulation.h"
+#include <vector>
+
+template <class T = long double>
+Matrix <T> getMatrixA(
+		std::vector<char> ATree,
+		std::map <char, std::pair<int, int>> & invBranchName,
+		int nodes,
+		int branches)
+{
+	std::vector<char> branchesOrder = getBranchesOrder(ATree, invBranchName);
+
+	Matrix <T> A(nodes, branches);
+
+	for(int branch = 0; branch < branches; ++branch)
+	{
+		A.setElement(invBranchName[branchesOrder[branch]].first, branch, 1.0L);
+		A.setElement(invBranchName[branchesOrder[branch]].second, branch, -1.0L);
+	}
+
+	return A;
+}
+
+template <class T = long double>
+Matrix <T> getMatrixATree(
+		std::vector<char> ATree,
+		std::map <char, std::pair<int, int>> & invBranchName,
+		int nodes,
+		int branches)
+{
+	Matrix <T> A = getMatrixA(ATree, invBranchName, nodes, branches);
+	Matrix <T> matrixATree(A, 0, nodes - 2, 0, nodes - 2);
+
+	return matrixATree;
+}
+
+template <class T = long double>
+Matrix <T> getMatrixALink(
+		std::vector<char> ATree,
+		std::map <char, std::pair<int, int>> & invBranchName,
+		int nodes,
+		int branches)
+{
+	Matrix <T> A = getMatrixA(ATree, invBranchName, nodes, branches);
+	Matrix <T> matrixALink(A, 0, nodes - 2, nodes - 1, branches - 1);
+
+	return matrixALink;
+}
 
 template <class T = long double>
 Matrix <T> getMatrixCLink(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
@@ -43,44 +90,66 @@ Matrix <T> getMatrixB(Matrix <T> const & matrixATree, Matrix <T> const & matrixA
 }
 
 template <class T = long double>
-
-Matrix <T> getMatrixA(std::vector<char> ATree,
-		std::map <char, std::pair<int, int>> & invBranchName,
-		int nodes, int branches)
+Matrix <T> getMatrixImpedence(std::vector<T> const & resistances)
 {
-	std::vector<char> branchesOrder = getBranchesOrder(ATree, invBranchName);
+	int resistancesSize = (int)resistances.size();
+	Matrix <T> matrixImpedence(resistancesSize, resistancesSize);
 
-	Matrix <T> A(nodes, branches);
+	for(int row = 0; row < matrixImpedence.getRows(); ++row)
+			matrixImpedence.setElement(row, row, resistances[row]);
 
-	for(int branch = 0; branch < branches; ++branch)
-	{
-		A.setElement(invBranchName[branchesOrder[branch]].first, branch, 1.0L);
-		A.setElement(invBranchName[branchesOrder[branch]].second, branch, -1.0L);
-	}
-
-	return A;
+	return matrixImpedence * IdentityMatrix <T> (matrixImpedence.getRows(), matrixImpedence.getRows());
 }
 
 template <class T = long double>
-Matrix <T> getMatrixATree(std::vector<char> ATree,
-		std::map <char, std::pair<int, int>> & invBranchName,
-		int nodes, int branches)
+Matrix <T> getMatrixCurrentSource(std::vector<T> const & currentSources)
 {
-	Matrix <T> A = getMatrixA(ATree, invBranchName, nodes, branches);
-	Matrix <T> matrixATree(A, 0, nodes - 2, 0, nodes - 2);
+	Matrix <T> matrixCurrentSource((int)currentSources.size(), 1);
+	for(int row = 0; row < matrixCurrentSource.getRows(); ++row)
+		matrixCurrentSource.setElement(row, 0, currentSources[row]);
 
-	return matrixATree;
+	return matrixCurrentSource;
 }
 
 template <class T = long double>
-Matrix <T> getMatrixALink(std::vector<char> ATree,
-		std::map <char, std::pair<int, int>> & invBranchName,
-		int nodes, int branches)
+Matrix <T> getMatrixVoltageSource(std::vector<T> const & voltageSources)
 {
-	Matrix <T> A = getMatrixA(ATree, invBranchName, nodes, branches);
-	Matrix <T> matrixALink(A, 0, nodes - 2, nodes - 1, branches - 1);
+	Matrix <T> matrixVoltageSource((int)voltageSources.size(), 1);
+	for(int row = 0; row < matrixVoltageSource.getRows(); ++row)
+		matrixVoltageSource.setElement(row, 0, voltageSources[row]);
 
-	return matrixALink;
+	return matrixVoltageSource;
+}
+
+template <class T = long double>
+Matrix <T> getMatrixILoop(
+		Matrix <T> const & B,
+		Matrix <T> const & matrixImpedence,
+		Matrix <T> const & matrixCurrentSource,
+		Matrix <T> const & matrixVoltageSource)
+{
+	Matrix <T> rightHandSide = (B * matrixVoltageSource) - (B * (matrixImpedence * matrixCurrentSource));
+	Matrix <T> leftHandSide = B * (matrixImpedence * B.getTranspose());
+
+	return leftHandSide.getInverse() * rightHandSide;
+}
+
+template <class T = long double>
+Matrix <T> getMatrixJBranch (Matrix <T> const & iLoop, Matrix <T> const & B)
+{
+	return B.getTranspose() * iLoop;
+}
+
+template <class T = long double>
+Matrix <T> getMatrixVBranch (
+		Matrix <T> const & jBranch,
+		Matrix <T> const & matrixImpedence,
+		Matrix <T> const & matrixCurrentSource,
+		Matrix <T> const & matrixVoltageSource)
+{
+	Matrix <long double> vBranch = matrixImpedence * (jBranch + matrixCurrentSource) - matrixVoltageSource;
+
+	return vBranch;
 }
 
 #endif // EQUATIONS_H
