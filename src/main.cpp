@@ -1,10 +1,13 @@
 #include "matrix_manipulation.h"
+#include "equations.h"
 #include "inputs.h"
 #include "colors.h"
 
+#include <vector>
+
 int main(int argc, char* argv[])
 {
-	_inputInstructions_A();
+	inputInstructions_A();
 
 	int nodes;
 	int branches;
@@ -16,7 +19,11 @@ int main(int argc, char* argv[])
 
 	std::vector<char> ATree = findTree(graph, branchName, nodes, branches);
 
-	_inputInstructions_B(ATree, branchName, invBranchName);
+	inputInstructions_B(ATree, invBranchName);
 
 	std::vector<std::vector<long double>> values = readValues(branches);
+
+	Matrix <long double> matrixATree = getMatrixATree(ATree, invBranchName, nodes, branches);
+
+	std::cout << matrixATree << std::endl;
 }

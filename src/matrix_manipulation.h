@@ -36,26 +36,26 @@
 
 #include <assert.h>
 
-template <class T = long long>
+template <class T = long double>
 class IdentityMatrix;
 
-template <class T = long long>
+template <class T = long double>
 class Matrix
 {
 	protected:
 		// Matrix dimensions
-		unsigned int rows;
-		unsigned int columns;
+		int rows;
+		int columns;
 
 		// Storage for matrix data
 		std::vector <std::vector <T>> matrix;
 
 		// Order sub-index for rows.
 		// Use: matrix[order[row]][column].
-		std::vector <unsigned int> order;
+		std::vector <int> order;
 
 		template <class ForwardIterator>
-		void iota(ForwardIterator first, ForwardIterator last, unsigned int value)
+		void iota(ForwardIterator first, ForwardIterator last, int value)
 		{
 			while(first != last)
 			{
@@ -66,7 +66,7 @@ class Matrix
 		}
 
 		/** Allocate memory for matrix data */
-		void allocate(unsigned int numberOfRows, unsigned int numberOfColumns)
+		void allocate(int numberOfRows, int numberOfColumns)
 		{
 			rows = numberOfRows;
 			columns = numberOfColumns;
@@ -80,12 +80,12 @@ class Matrix
 		}
 
 		/** Return the number of leading zeros in the given row */
-		unsigned int getLeadingZeros(unsigned int row) const
+		int getLeadingZeros(int row) const
 		{
 			assert(row < rows);
 
 			T ZERO = static_cast <T> (0);
-			unsigned int column = 0;
+			int column = 0;
 			while(column < columns && matrix[row][column] == ZERO)
 			{
 				++column;
@@ -97,16 +97,16 @@ class Matrix
 		/** Reorder the matrix according to the number of leading zeros, descendingly */
 		void reorder()
 		{
-			unsigned int* zeros = new unsigned int[rows];
-			for(int row = 0; row < static_cast<int>(rows); ++row)
+			int* zeros = new int[rows];
+			for(int row = 0; row < rows; ++row)
 			{
 				zeros[row] = getLeadingZeros(row);
 			}
 
 			// Bubble sort
-			for(int row = static_cast<int>(rows) - 1; row >= 0; --row)
+			for(int row = rows - 1; row >= 0; --row)
 			{
-				unsigned int indexOfMax = row;
+				int indexOfMax = row;
 				for(int subRow = row - 1; subRow >= 0; --subRow)
 				{
 					if(zeros[subRow] > zeros[indexOfMax])
@@ -124,18 +124,18 @@ class Matrix
 		}
 
 		/** Divide a row by given value.  An elementary row operation. */
-		void divideRow(unsigned int row, T const & divisor)
+		void divideRow(int row, T const & divisor)
 		{
-			for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int column = 0; column < columns; ++column)
 			{
 				matrix[row][column] /= divisor;
 			}
 		}
 
 		/** Modify a row by adding a scaled row. An elementary row operation. */
-		void rowOperation(unsigned int row, unsigned int addRow, T const & scale)
+		void rowOperation(int row, int addRow, T const & scale)
 		{
-			for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int column = 0; column < columns; ++column)
 			{
 				matrix[row][column] += matrix[addRow][column] * scale;
 			}
@@ -150,7 +150,7 @@ class Matrix
 		} Position;
 
 		// Constructor using rows and columns.
-		Matrix(unsigned int numberOfRows, unsigned int numberOfColumns)
+		Matrix(int numberOfRows, int numberOfColumns)
 		{
 			allocate(numberOfRows, numberOfColumns);
 		}
@@ -169,48 +169,18 @@ class Matrix
 
 		/**
 				This constructor will allow the creation of a matrix based off
-				an other matrix.  It can copy the matrix entirely, or omitted a
-				row/column.
+				an other matrix.  It can copy the matrix entirely, or submatrix of it;
 		*/
-		Matrix(Matrix const & copyMatrix, unsigned int omittedRow = INT_MAX, unsigned int omittedColumn = INT_MAX)
+		Matrix(Matrix & copyMatrix, int rowStart, int rowEnd, int columnStart, int columnEnd)
 		{
-			// Start with the number of rows/columns from matrix to be copied.
-			rows    = copyMatrix.getRows();
-			columns = copyMatrix.getColumns();
+			int newRows   = rowEnd - rowStart + 1;
+			int newColumns = columnEnd - columnStart + 1;
 
-			// If a row is omitted, then there is one less row.
-			if(INT_MAX != omittedRow)
-				--rows;
+			allocate(newRows, newColumns);
 
-			// If a column is omitted, then there is one less column.
-			if(INT_MAX != omittedColumn)
-				--columns;
-
-			// Allocate memory for new matrix.
-			allocate(rows, columns);
-
-			unsigned int rowIndex = 0;
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-			{
-				// If this row is to be skipped...
-				if(rowIndex == omittedRow)
-					rowIndex++;
-
-				// Set default order.
-				order[row] = row;
-
-				unsigned int columnIndex = 0;
-				for(int column = 0; column < static_cast<int>(columns); ++column)
-				{
-					// If this column is to be skipped...
-					if(columnIndex == omittedColumn)
-						++columnIndex;
-
-					matrix[row][column] = copyMatrix.matrix[rowIndex][columnIndex];
-					++columnIndex;
-				}
-				++rowIndex;
-			}
+			for(int row = rowStart, newRow = 0; row <= rowEnd; ++row, ++newRow)
+				for(int column = columnStart, newColumn = 0; column <= columnEnd; ++column, ++newColumn)
+					matrix[newRow][newColumn] = copyMatrix.getElement(row, column);
 		}
 
 		/**
@@ -220,8 +190,8 @@ class Matrix
 		*/
 		Matrix(Matrix const & copyMatrixA, Matrix const & copyMatrixB, Position position = TO_RIGHT)
 		{
-			unsigned int rowOffset    = 0;
-			unsigned int columnOffset = 0;
+			int rowOffset    = 0;
+			int columnOffset = 0;
 
 			if(TO_RIGHT == position)
 				columnOffset = copyMatrixA.columns;
@@ -234,29 +204,29 @@ class Matrix
 			// Allocate memory for new matrix.
 			allocate(rows, columns);
 
-			for(int row = 0; row < static_cast<int>(copyMatrixA.rows); ++row)
-				for(int column = 0; column < static_cast<int>(copyMatrixA.columns); ++column)
+			for(int row = 0; row < copyMatrixA.rows; ++row)
+				for(int column = 0; column < copyMatrixA.columns; ++column)
 					matrix[row][column] = copyMatrixA.matrix[row][column];
 
-			for(int row = 0; row < static_cast<int>(copyMatrixB.rows); ++row)
-				for(int column = 0; column < static_cast<int>(copyMatrixB.columns); ++column)
+			for(int row = 0; row < copyMatrixB.rows; ++row)
+				for(int column = 0; column < copyMatrixB.columns; ++column)
 					matrix[row + rowOffset][column + columnOffset] = copyMatrixB.matrix[row][column];
 		}
 
 		/** Return the number of rows in this matrix */
 		int getRows() const
 		{
-			return static_cast<int>(rows);
+			return rows;
 		}
 
 		/** Return the number of columns in this matrix */
 		int getColumns() const
 		{
-			return static_cast<int>(columns);
+			return columns;
 		}
 
 		/** Get an element of the matrix */
-		T getElement(unsigned int row, unsigned int column) const
+		T getElement(int row, int column)
 		{
 			assert(row < rows);
 			assert(column < columns);
@@ -265,7 +235,7 @@ class Matrix
 		}
 
 		/** Set an element in the matrix */
-		void setElement(unsigned int row, unsigned int column, T const & value)
+		void setElement(int row, int column, T value)
 		{
 			assert(row < rows);
 			assert(column < columns);
@@ -282,11 +252,11 @@ class Matrix
 			upper = *this;
 			lower = *this;
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					lower.matrix[row][column] = ZERO;
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
+			for(int row = 0; row < rows; ++row)
 			{
 				T value = upper.matrix[row][row];
 				if(ZERO != value)
@@ -295,7 +265,7 @@ class Matrix
 					lower.matrix[row][row] = value;
 				}
 
-				for(int subRow = row + 1; subRow < static_cast<int>(rows); ++subRow)
+				for(int subRow = row + 1; subRow < rows; ++subRow)
 				{
 					value = upper.matrix[subRow][row];
 					upper.rowOperation(subRow, row, -value);
@@ -312,15 +282,15 @@ class Matrix
 				(0, rows - 1, 0, columns - 1).
 		*/
 		Matrix getSubMatrix(
-				unsigned int startRow, unsigned int endRow,
-				unsigned int startColumn, unsigned int endColumn,
-				std::vector <unsigned int> const & newOrder = std::vector<unsigned int>())
+				int startRow, int endRow,
+				int startColumn, int endColumn,
+				std::vector <int> const & newOrder = std::vector<int>())
 		{
 			Matrix subMatrix(endRow - startRow + 1, endColumn - startColumn + 1);
 
 			for(int row = startRow; row <= endRow; ++row)
 			{
-				unsigned int subRow;
+				int subRow;
 				if(newOrder.empty())
 					subRow = row;
 				else
@@ -334,13 +304,13 @@ class Matrix
 		}
 
 		/** Return a single column from the matrix. */
-		Matrix getColumn(unsigned int column)
+		Matrix getColumn(int column)
 		{
 			return getSubMatrix(0, rows - 1, column, column);
 		}
 
 		/** Return a single row from the matrix. */
-		Matrix getRow(unsigned int row)
+		Matrix getRow(int row)
 		{
 			return getSubMatrix(row, row, 0, columns - 1);
 		}
@@ -351,24 +321,24 @@ class Matrix
 			T const ZERO = static_cast <T> (0);
 
 			// For each row...
-			for(int rowIndex = 0; rowIndex < static_cast<int>(rows); ++rowIndex)
+			for(int rowIndex = 0; rowIndex < rows; ++rowIndex)
 			{
 				// Reorder the rows.
 				reorder();
 
-				unsigned int row = order[rowIndex];
+				int row = order[rowIndex];
 
 				// Divide row down so first term is 1.
-				unsigned int column = getLeadingZeros(row);
+				int column = getLeadingZeros(row);
 				T divisor = matrix[row][column];
 				if(ZERO != divisor)
 				{
 					divideRow(row, divisor);
 
 					// Subtract this row from all subsequent rows.
-					for(int subRowIndex = (rowIndex + 1); subRowIndex < static_cast<int>(rows); ++subRowIndex)
+					for(int subRowIndex = rowIndex + 1; subRowIndex < rows; ++subRowIndex)
 					{
-						unsigned int subRow = order[subRowIndex];
+						int subRow = order[subRowIndex];
 						if(ZERO != matrix[subRow][column])
 							rowOperation(subRow, row, -matrix[subRow][column]);
 					}
@@ -376,13 +346,13 @@ class Matrix
 			}
 
 			// Back substitute all lower rows.
-			for(int rowIndex = static_cast<int>(rows ) - 1; rowIndex > 0; --rowIndex)
+			for(int rowIndex = rows - 1; rowIndex > 0; --rowIndex)
 			{
-				unsigned int row = order[rowIndex];
-				unsigned int column = getLeadingZeros(row);
+				int row = order[rowIndex];
+				int column = getLeadingZeros(row);
 				for(int subRowIndex = 0; subRowIndex < rowIndex; ++subRowIndex)
 				{
-					unsigned int subRow = order[subRowIndex];
+					int subRow = order[subRowIndex];
 					rowOperation(subRow, row, -matrix[subRow][column]);
 				}
 			}
@@ -401,7 +371,7 @@ class Matrix
 			if(rows > 2)
 			{
 				int sign = 1;
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+				for(int column = 0; column < columns; ++column)
 				{
 					T subDeterminant;
 
@@ -434,8 +404,8 @@ class Matrix
 			assert(columns == otherMatrix.columns);
 
 			T result = static_cast <T> (0);
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 				{
 					result += matrix[row][column] * 1ll * otherMatrix.matrix[row][column];
 				}
@@ -450,8 +420,8 @@ class Matrix
 			Matrix result(columns, rows);
 
 			/** Transpose the matrix by filling the result's rows will these columns, and vica versa. */
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					result.matrix[column][row] = matrix[row][column];
 
 			return result;
@@ -498,8 +468,8 @@ class Matrix
 
 			Matrix result(rows, columns);
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					result.matrix[row][column] = matrix[row][column] + otherMatrix.matrix[row][column];
 
 			return result;
@@ -521,7 +491,7 @@ class Matrix
 
 			Matrix result(rows, columns);
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
+			for(int row = 0; row < rows; ++row)
 				for(int column = 0; column < columns; ++column)
 					result.matrix[row][column] = matrix[row][column] - otherMatrix.matrix[row][column];
 
@@ -545,12 +515,12 @@ class Matrix
 
 			Matrix result(rows, otherMatrix.columns);
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(otherMatrix.columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < otherMatrix.columns; ++column)
 				{
 					result.matrix[row][column] = ZERO;
 
-					for(int index = 0; index < static_cast<int>(columns); ++index)
+					for(int index = 0; index < columns; ++index)
 						result.matrix[row][column] += matrix[row][index] * 1ll * otherMatrix.matrix[index][column];
 				}
 
@@ -570,8 +540,8 @@ class Matrix
 		{
 			Matrix result(rows, columns);
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					result.matrix[row][column] = matrix[row][column] * scalar;
 
 			return result;
@@ -593,8 +563,8 @@ class Matrix
 
 			allocate(rows, columns);
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					matrix[row][column] = otherMatrix.matrix[row][column];
 
 			return *this;
@@ -617,10 +587,10 @@ class Matrix
 		*/
 		Matrix & operator = (T const * data)
 		{
-			unsigned int index = 0;
+			int index = 0;
 
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					matrix[row][column] = data[index++];
 
 			return *this;
@@ -629,8 +599,8 @@ class Matrix
 		/** Return true if this matrix is the same of parameter. */
 		bool operator == (Matrix const & value) const
 		{
-			for(int row = 0; row < static_cast<int>(rows); ++row)
-				for(int column = 0; column < static_cast<int>(columns); ++column)
+			for(int row = 0; row < rows; ++row)
+				for(int column = 0; column < columns; ++column)
 					if(matrix[row][column] != value.matrix[row][column])
 						return false;
 
@@ -649,15 +619,15 @@ template <class T>
 class IdentityMatrix : public Matrix <T>
 {
 	public:
-		IdentityMatrix(unsigned int rowsParameter, unsigned int columnsParameter) :
+		IdentityMatrix(int rowsParameter, int columnsParameter) :
 			Matrix <T>(rowsParameter, columnsParameter)
 		{
 			T const ZERO = static_cast <T> (0);
 			T const ONE  = static_cast <T> (1);
 
-			for(int row = 0; row < static_cast<int>(Matrix <T>::rows); ++row)
+			for(int row = 0; row < Matrix <T>::rows; ++row)
 			{
-				for(int column = 0; column < static_cast<int>(Matrix<T>::columns); ++column)
+				for(int column = 0; column < Matrix<T>::columns; ++column)
 					if(row == column)
 						Matrix <T>::matrix[row][column] = ONE;
 					else
@@ -667,8 +637,8 @@ class IdentityMatrix : public Matrix <T>
 };
 
 /** Stream operator used to convert matrix class to a string. */
-template <class T>
-std::ostream & operator <<(std::ostream & stream, Matrix <T> const & matrix)
+template <class T = long double>
+std::ostream & operator <<(std::ostream & stream, Matrix <T> & matrix)
 {
 	for(int row = 0; row < matrix.getRows(); ++row)
 		for(int column = 0; column < matrix.getColumns(); ++column)
