@@ -20,8 +20,12 @@ int main(int argc, char* argv[])
 
 	Matrix <long double> matrixATree = getMatrixATree(ATree, invBranchName, nodes, branches);
 	Matrix <long double> matrixALink = getMatrixALink(ATree, invBranchName, nodes, branches);
-	std::cout << matrixATree << std::endl;
+	Matrix <long double> matrixA = getMatrixA(ATree, invBranchName, nodes, branches);
+	std::cout << matrixA << std::endl;
 
-	Matrix <long double> matrixBTree = getBTree(matrixATree, matrixALink);
-	std::cout << matrixBTree << std::endl;
+	Matrix <long double> matrixB = getMatrixB(matrixATree, matrixALink);
+	std::cout << matrixB << std::endl;
+
+	Matrix <long double> matrixC = getMatrixC(matrixATree, matrixALink);
+	std::cout << matrixC << std::endl;
 }

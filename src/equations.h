@@ -5,18 +5,45 @@
 #include "matrix_manipulation.h"
 
 template <class T = long double>
-Matrix <T> getCLink(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
+Matrix <T> getMatrixCLink(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
 {
-	return matrixATree.getInverse() * matrixALink;
+	Matrix <T> matrixATreeInverse = matrixATree.getInverse();
+
+	return (matrixATreeInverse * matrixALink);
 }
 
 template <class T = long double>
-Matrix <T> getBTree(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
+Matrix <T> getMatrixBTree(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
 {
-	return getCLink(matrixATree, matrixALink).getTranspose() * -1;
+	Matrix <T> matrixCLink = getMatrixCLink(matrixATree, matrixALink);
+
+	return (matrixCLink.getTranspose() * -1.0L);
 }
 
 template <class T = long double>
+Matrix <T> getMatrixC(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
+{
+	Matrix <T> matrixCLink = getMatrixCLink(matrixATree, matrixALink);
+	IdentityMatrix <T> matrixCTree(matrixCLink.getRows(), matrixCLink.getRows());
+
+	Matrix <T> matrixC(matrixCTree, matrixCLink, Matrix<T>::Position::TO_RIGHT);
+
+	return matrixC;
+}
+
+template <class T = long double>
+Matrix <T> getMatrixB(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)
+{
+	Matrix <T> matrixBTree = getMatrixBTree(matrixATree, matrixALink);
+	IdentityMatrix <T> matrixBLink(matrixBTree.getRows(), matrixBTree.getRows());
+
+	Matrix <T> matrixB(matrixBTree, matrixBLink, Matrix<T>::Position::TO_RIGHT);
+
+	return matrixB;
+}
+
+template <class T = long double>
+
 Matrix <T> getMatrixA(std::vector<char> ATree,
 		std::map <char, std::pair<int, int>> & invBranchName,
 		int nodes, int branches)

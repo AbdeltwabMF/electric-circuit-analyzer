@@ -173,14 +173,25 @@ class Matrix
 		*/
 		Matrix(Matrix & copyMatrix, int rowStart, int rowEnd, int columnStart, int columnEnd)
 		{
-			int newRows   = rowEnd - rowStart + 1;
+			int newRows = rowEnd - rowStart + 1;
 			int newColumns = columnEnd - columnStart + 1;
+
+			int copyMatrixRows = copyMatrix.getRows();
+			int copyMatrixColumns = copyMatrix.getColumns();
+
+			assert(rowStart >=0 && rowStart < copyMatrixRows);
+			assert(rowStart <= rowEnd && rowEnd < copyMatrixRows);
+
+			assert(columnStart >= 0 && columnStart < copyMatrixColumns);
+			assert(columnStart <= columnEnd && columnEnd < copyMatrixColumns);
 
 			allocate(newRows, newColumns);
 
 			for(int row = rowStart, newRow = 0; row <= rowEnd; ++row, ++newRow)
 				for(int column = columnStart, newColumn = 0; column <= columnEnd; ++column, ++newColumn)
+				{
 					matrix[newRow][newColumn] = copyMatrix.getElement(row, column);
+				}
 		}
 
 		/**
@@ -454,7 +465,7 @@ class Matrix
 			for(int row = 0; row < rows; ++row)
 				for(int column = 0; column < columns; ++column)
 				{
-					result += matrix[row][column] * 1ll * otherMatrix.matrix[row][column];
+					result += matrix[row][column] * 1.0L * otherMatrix.matrix[row][column];
 				}
 
 			return result;
