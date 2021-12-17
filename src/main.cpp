@@ -1,9 +1,4 @@
-#include "matrix_manipulation.h"
 #include "equations.h"
-#include "inputs.h"
-#include "colors.h"
-
-#include <vector>
 
 int main(int argc, char* argv[])
 {
@@ -24,6 +19,9 @@ int main(int argc, char* argv[])
 	std::vector<std::vector<long double>> values = readValues(branches);
 
 	Matrix <long double> matrixATree = getMatrixATree(ATree, invBranchName, nodes, branches);
-
+	Matrix <long double> matrixALink = getMatrixALink(ATree, invBranchName, nodes, branches);
 	std::cout << matrixATree << std::endl;
+
+	Matrix <long double> matrixBTree = getBTree(matrixATree, matrixALink);
+	std::cout << matrixBTree << std::endl;
 }

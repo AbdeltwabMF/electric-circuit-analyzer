@@ -1,8 +1,8 @@
 #ifndef EQUATIONS_H
 #define EQUATIONS_H
 
-#include "matrix_manipulation.h"
 #include "inputs.h"
+#include "matrix_manipulation.h"
 
 template <class T = long double>
 Matrix <T> getCLink(Matrix <T> const & matrixATree, Matrix <T> const & matrixALink)

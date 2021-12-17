@@ -1,7 +1,6 @@
 #include "inputs.h"
 
 #include "colors.h"
-#include "matrix_manipulation.h"
 
 #include <cstddef>
 #include <iterator>

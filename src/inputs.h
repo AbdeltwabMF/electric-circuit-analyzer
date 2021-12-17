@@ -1,8 +1,6 @@
 #ifndef INPUTS_H
 #define INPUTS_H
 
-#include "colors.h"
-#include "matrix_manipulation.h"
 #include <vector>
 #include <map>
 #include <string>
