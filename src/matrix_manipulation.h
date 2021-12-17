@@ -213,6 +213,53 @@ class Matrix
 					matrix[row + rowOffset][column + columnOffset] = copyMatrixB.matrix[row][column];
 		}
 
+		/**
+			This constructor will allow the creation of a matrix based off
+			an other matrix.  It can copy the matrix entirely, or omitted a
+			row/column.
+		*/
+		Matrix(Matrix const & copyMatrix, int omittedRow = INT_MAX, int omittedColumn = INT_MAX)
+		{
+			// Start with the number of rows/columns from matrix to be copied.
+			rows    = copyMatrix.getRows();
+			columns = copyMatrix.getColumns();
+
+			// If a row is omitted, then there is one less row.
+			if(INT_MAX != omittedRow)
+				--rows;
+
+			// If a column is omitted, then there is one less column.
+			if(INT_MAX != omittedColumn)
+				--columns;
+
+			// Allocate memory for new matrix.
+			allocate(rows, columns);
+
+			int rowIndex = 0;
+			for(int row = 0; row < rows; ++row)
+			{
+				// If this row is to be skipped...
+				if(rowIndex == omittedRow)
+					++rowIndex;
+
+				// Set default order.
+				order[row] = row;
+
+				unsigned columnIndex = 0;
+				for(int column = 0; column < columns; ++column)
+				{
+					// If this column is to be skipped...
+					if(columnIndex == omittedColumn)
+						columnIndex++;
+
+					matrix[row][column] = copyMatrix.matrix[rowIndex][columnIndex];
+
+					columnIndex++;
+				}
+				++rowIndex;
+			}
+		}
+
 		/** Return the number of rows in this matrix */
 		int getRows() const
 		{
