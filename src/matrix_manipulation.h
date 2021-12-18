@@ -179,10 +179,10 @@ class Matrix
 			int copyMatrixRows = copyMatrix.getRows();
 			int copyMatrixColumns = copyMatrix.getColumns();
 
-			assert(rowStart >=0 && rowStart < copyMatrixRows);
+			assert(rowStart >= 0);
 			assert(rowStart <= rowEnd && rowEnd < copyMatrixRows);
 
-			assert(columnStart >= 0 && columnStart < copyMatrixColumns);
+			assert(columnStart >= 0);
 			assert(columnStart <= columnEnd && columnEnd < copyMatrixColumns);
 
 			allocate(newRows, newColumns);

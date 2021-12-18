@@ -5,6 +5,7 @@
 #include "colors.h"
 
 #include <ios>
+#include <ostream>
 #include <vector>
 #include <iomanip>
 #include <iostream>
@@ -63,7 +64,7 @@ void formatResult(
 		std::vector <char> const & branchesOrder)
 {
 	std::cout << std::fixed << std::setprecision(8);
-	std::cout << std::endl << Green  << "                THE ANSWER                      " << Reset << std::endl;
+	std::cout << std::endl << Green  << " The Answer:" << Reset << std::endl;
 	std::cout << Yellow << "                Voltage(V)  \t Current(A)" << Reset << std::endl;
 	std::cout << Yellow << "   ----------   ----------- \t ----------" << Reset << std::endl;
 	for(int branch = 0; branch < branchesOrder.size(); ++branch)
@@ -72,6 +73,20 @@ void formatResult(
 			<< Purple << vBranch.getElement(branch, 0) << " \t " \
 			<< Blue << jBranch.getElement(branch, 0) << std::endl;
 	}
+	std::cout << std::endl;
+}
+
+template<class T = long double>
+void formatMatrix(Matrix <T> & X, std::string name)
+{
+	std::cout << White << "   Matrix: " << colorAndRest(name, Yellow, Cyan) << std::endl;
+	for(int row = 0; row < X.getRows(); ++row)
+	{
+		std::cout << "     ";
+		for(int column = 0; column < X.getColumns(); ++column)
+			std::cout << X.getElement(row, column) << " \n"[column == X.getColumns() - 1];
+	}
+	std::cout << std::endl;
 }
 
 #endif // INPUTS_H

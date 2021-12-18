@@ -45,7 +45,7 @@ void inputInstructions_A()
 	std::cout << Yellow << "\n   " \
 		<< colorAndRest("Caution:", Red, Yellow) \
 		<< " The input order of the branches are SORTED\n   from 'a' till the end." << std::endl;
-	std::cout << std::endl << Green  << " The input:" << Reset << std::endl;
+	std::cout << std::endl << Green  << " The Input:\n" << Reset << std::endl;
 }
 
 std::vector<char> getBranchesOrder(
@@ -70,26 +70,26 @@ void inputInstructions_B(
 		std::vector<char> treeBranches,
 		std::map <char, std::pair<int, int>> & invBranchName)
 {
-	std::cout << Cyan << " Each of the next " \
+	std::cout << Cyan << "   Each of the next " \
 		<< colorAndRest("three", Yellow, Cyan) \
-		<< " lines contains an array of " \
+		<< " lines contains an array of \n   " \
 		<< colorAndRest(std::to_string(invBranchName.size()), Yellow, Cyan) \
-		<< " values \
-		\n   - the voltage sources, the current sources \
+		<< " values - the voltage sources, the current sources \
 		\n   and the resistances on the branches." << std::endl;
 	std::cout << Purple << "\n   The Branches are in the following order:" << std::endl;
 
 	std::vector<char> branchesOrder = getBranchesOrder(treeBranches, invBranchName);
-	std::string values[3] = {"\tVoltage Sources: ", "\tCurrent Sources: ", "\tResistances    : "};
+	std::string values[3] = {"  Voltage Sources: ", "  Current Sources: ", "  Resistances    : "};
 
 	for(int vcr = 0; vcr < 3; ++vcr)
 	{
-		std::cout << White << values[vcr];
+		std::cout << White << "   " << values[vcr];
 		for(char ch : branchesOrder)
 			std::cout << Yellow << " " << ch;
 
 		std::cout << Reset << std::endl;
 	}
+	std::cout << std::endl << Green << " The Process:\n" << std::endl;
 }
 
 /** Searching for Tree branches */
