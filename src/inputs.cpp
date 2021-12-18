@@ -70,7 +70,7 @@ void inputInstructions_B(
 		std::vector<char> treeBranches,
 		std::map <char, std::pair<int, int>> & invBranchName)
 {
-	std::cout << Cyan << "   Each of the next " \
+	std::cout << Cyan << "\n   Each of the next " \
 		<< colorAndRest("three", Yellow, Cyan) \
 		<< " lines contains an array of \n   " \
 		<< colorAndRest(std::to_string(invBranchName.size()), Yellow, Cyan) \
@@ -89,7 +89,7 @@ void inputInstructions_B(
 
 		std::cout << Reset << std::endl;
 	}
-	std::cout << std::endl << Green << " The Process:\n" << std::endl;
+	std::cout << std::endl;
 }
 
 /** Searching for Tree branches */

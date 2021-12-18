@@ -54,6 +54,7 @@ std::vector<std::vector<T>> readValues(int branches)
 		for(int branch = 0; branch < branches; ++branch)
 			std::cin >> ret[vcr][branch];
 
+	std::cout << std::endl << colorAndRest(" The Process:\n", Green, Reset) << std::endl;
 	return ret;
 }
 
@@ -64,7 +65,7 @@ void formatResult(
 		std::vector <char> const & branchesOrder)
 {
 	std::cout << std::fixed << std::setprecision(8);
-	std::cout << std::endl << Green  << " The Answer:" << Reset << std::endl;
+	std::cout << Green  << " The Answer:" << Reset << std::endl;
 	std::cout << Yellow << "                Voltage(V)  \t Current(A)" << Reset << std::endl;
 	std::cout << Yellow << "   ----------   ----------- \t ----------" << Reset << std::endl;
 	for(int branch = 0; branch < branchesOrder.size(); ++branch)
@@ -73,7 +74,6 @@ void formatResult(
 			<< Purple << vBranch.getElement(branch, 0) << " \t " \
 			<< Blue << jBranch.getElement(branch, 0) << std::endl;
 	}
-	std::cout << std::endl;
 }
 
 template<class T = long double>
