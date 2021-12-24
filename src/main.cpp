@@ -9,43 +9,44 @@ int main(int argc, char* argv[])
 	int nodes;
 	int branches;
 
-	std::map <std::pair<int, int>, char> branchName;
-	std::map <char, std::pair<int, int>> invBranchName;
+	std::map <std::pair <int, int>, char> endNodesToItsBranchName;
+	std::map <char, std::pair <int, int>> branchNameToItsNodes;
 
-	std::vector<std::vector<int>> graph	= readGraph(branchName, invBranchName, nodes, branches);
-	std::vector<char> treeBranches			= findTree(graph, branchName, nodes, branches);
+	std::vector <std::vector <int>> graph	= readDirectedGraph(endNodesToItsBranchName, branchNameToItsNodes, nodes, branches);
+	std::vector <char> orderedTreeBranches	= findTree(graph, endNodesToItsBranchName, nodes, branches);
 
-	inputInstructions_B(treeBranches, invBranchName);
+	inputInstructions_B(orderedTreeBranches, branchNameToItsNodes);
 
-	std::vector<std::vector<long double>> values = readValues(branches);
+	std::vector<std::vector<long double>> values = readCircuitComponents(branches);
 
-	Matrix <long double> matrixATree = getMatrixATree(treeBranches, invBranchName, nodes, branches);
-	Matrix <long double> matrixALink = getMatrixALink(treeBranches, invBranchName, nodes, branches);
+	Matrix <long double> matrixaTree = getATree(orderedTreeBranches, branchNameToItsNodes, nodes, branches);
+	Matrix <long double> matrixaLink = getALink(orderedTreeBranches, branchNameToItsNodes, nodes, branches);
 
-	Matrix <long double> A = getMatrixA(treeBranches, invBranchName, nodes, branches);
-	Matrix <long double> B = getMatrixB(matrixATree, matrixALink);
-	Matrix <long double> C = getMatrixC(matrixATree, matrixALink);
+	Matrix <long double> a = getA(orderedTreeBranches, branchNameToItsNodes, nodes, branches);
+	Matrix <long double> b = getB(matrixaTree, matrixaLink);
+	Matrix <long double> c = getC(matrixaTree, matrixaLink);
 
-	formatMatrix(A, "Incidence");
-	formatMatrix(B, "Tie-set");
-	formatMatrix(C, "Cut-set");
+	formatMatrix(a, "Incidence");
+	formatMatrix(b, "Tie-set");
+	formatMatrix(c, "Cut-set");
 
-	Matrix <long double> matrixVoltageSource 	= getMatrixVoltageSource(values[0]);
-	Matrix <long double> matrixCurrentSource	= getMatrixCurrentSource(values[1]);
-	Matrix <long double> matrixImpedence			= getMatrixImpedence(values[2]);
+	Matrix <long double> voltageSource 	= getVoltageSource(values[0]);
+	Matrix <long double> currentSource	= getCurrentSource(values[1]);
+	Matrix <long double> impedence			= getImpedence(values[2]);
 
-	Matrix <long double> iLoop = getMatrixILoop(B,
-		matrixImpedence, matrixCurrentSource, matrixVoltageSource);
+	Matrix <long double> iLoop = getILoop(b,
+		impedence, currentSource, voltageSource);
 
-	Matrix <long double> jBranch = getMatrixJBranch(iLoop, B);
+	Matrix <long double> jBranch = getJBranch(iLoop, b);
 
-	Matrix <long double> vBranch = getMatrixVBranch(jBranch,
-			matrixImpedence, matrixCurrentSource, matrixVoltageSource);
+	Matrix <long double> vBranch = getVBranch(jBranch,
+			impedence, currentSource, voltageSource);
 
 	formatMatrix(iLoop, "I Loop");
 	formatMatrix(jBranch, "J Branch");
 	formatMatrix(vBranch, "V Branch");
 
-	std::vector<char> branchesOrder = getBranchesOrder(treeBranches, invBranchName);
-	formatResult(vBranch, jBranch, branchesOrder);
+	std::vector <char> orderedBranches = getBranchesOrder(orderedTreeBranches, branchNameToItsNodes);
+
+	formatResult(vBranch, jBranch, orderedBranches);
 }
