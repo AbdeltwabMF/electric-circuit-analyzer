@@ -68,6 +68,7 @@ void formatResult(
 	std::cout << Green  << " The Answer:" << Reset << std::endl;
 	std::cout << Yellow << "                Voltage(V)  \t Current(A)" << Reset << std::endl;
 	std::cout << Yellow << "   ----------   ----------- \t ----------" << Reset << std::endl;
+
 	for(int branch = 0; branch < branchesOrder.size(); ++branch)
 	{
 		std::cout << colorAndRest("   Branch: ", Cyan, White) << "'" << branchesOrder[branch] << "'  " \

@@ -3,22 +3,23 @@
 
 #include "inputs.h"
 #include "matrix_manipulation.h"
+
 #include <vector>
 
 template <class T = long double>
 Matrix <T> getMatrixA(
-		std::vector<char> ATree,
-		std::map <char, std::pair<int, int>> & invBranchName,
+		std::vector <char> treeBranches,
+		std::map <char, std::pair <int, int>> & invBranchName,
 		int nodes,
 		int branches)
 {
-	std::vector<char> branchesOrder = getBranchesOrder(ATree, invBranchName);
+	std::vector <char> branchesOrder = getBranchesOrder(treeBranches, invBranchName);
 
 	Matrix <T> A(nodes, branches);
 
 	for(int branch = 0; branch < branches; ++branch)
 	{
-		A.setElement(invBranchName[branchesOrder[branch]].first, branch, 1.0L);
+		A.setElement(invBranchName[branchesOrder[branch]].first,  branch,  1.0L);
 		A.setElement(invBranchName[branchesOrder[branch]].second, branch, -1.0L);
 	}
 
@@ -27,26 +28,26 @@ Matrix <T> getMatrixA(
 
 template <class T = long double>
 Matrix <T> getMatrixATree(
-		std::vector<char> ATree,
-		std::map <char, std::pair<int, int>> & invBranchName,
+		std::vector <char> treeBranches,
+		std::map <char, std::pair <int, int>> & invBranchName,
 		int nodes,
 		int branches)
 {
-	Matrix <T> A = getMatrixA(ATree, invBranchName, nodes, branches);
-	Matrix <T> matrixATree(A, 0, nodes - 2, 0, nodes - 2);
+	Matrix <T> A = getMatrixA(treeBranches, invBranchName, nodes, branches);
+	Matrix <T> matrixATree(A, 0, nodes - 2, 0, (int)treeBranches.size() - 1);
 
 	return matrixATree;
 }
 
 template <class T = long double>
 Matrix <T> getMatrixALink(
-		std::vector<char> ATree,
-		std::map <char, std::pair<int, int>> & invBranchName,
+		std::vector <char> treeBranches,
+		std::map <char, std::pair <int, int>> & invBranchName,
 		int nodes,
 		int branches)
 {
-	Matrix <T> A = getMatrixA(ATree, invBranchName, nodes, branches);
-	Matrix <T> matrixALink(A, 0, nodes - 2, nodes - 1, branches - 1);
+	Matrix <T> A = getMatrixA(treeBranches, invBranchName, nodes, branches);
+	Matrix <T> matrixALink(A, 0, nodes - 2, (int)treeBranches.size(), branches - 1);
 
 	return matrixALink;
 }
@@ -90,9 +91,9 @@ Matrix <T> getMatrixB(Matrix <T> const & matrixATree, Matrix <T> const & matrixA
 }
 
 template <class T = long double>
-Matrix <T> getMatrixImpedence(std::vector<T> const & resistances)
+Matrix <T> getMatrixImpedence(std::vector <T> const & resistances)
 {
-	int resistancesSize = (int)resistances.size();
+	int resistancesSize = resistances.size();
 	Matrix <T> matrixImpedence(resistancesSize, resistancesSize);
 
 	for(int row = 0; row < matrixImpedence.getRows(); ++row)
@@ -102,7 +103,7 @@ Matrix <T> getMatrixImpedence(std::vector<T> const & resistances)
 }
 
 template <class T = long double>
-Matrix <T> getMatrixCurrentSource(std::vector<T> const & currentSources)
+Matrix <T> getMatrixCurrentSource(std::vector <T> const & currentSources)
 {
 	Matrix <T> matrixCurrentSource((int)currentSources.size(), 1);
 	for(int row = 0; row < matrixCurrentSource.getRows(); ++row)
@@ -112,7 +113,7 @@ Matrix <T> getMatrixCurrentSource(std::vector<T> const & currentSources)
 }
 
 template <class T = long double>
-Matrix <T> getMatrixVoltageSource(std::vector<T> const & voltageSources)
+Matrix <T> getMatrixVoltageSource(std::vector <T> const & voltageSources)
 {
 	Matrix <T> matrixVoltageSource((int)voltageSources.size(), 1);
 	for(int row = 0; row < matrixVoltageSource.getRows(); ++row)
